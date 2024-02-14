@@ -1,0 +1,156 @@
+###############################################
+# How to Create and Manage Cron Jobs on Linux #
+###############################################
+______________________________________________________
+Sumon Paul					       
+Cloud Engineer					       
+Aamra Networks Ltd.				       
+linkedin: https://www.linkedin.com/in/sumonpaul/ 
+-------------------------------------------------------
+++++++++++++++++++++++++++++++++++++
++ Install Crontab Package Install: +
+++++++++++++++++++++++++++++++++++++
+rpm -qa | grep cronie       [cronie is a package,By default cronie has installed ]
+yum install cronie -y 
+
+++++++++++++++++++++++++++++++++
++ Cron Service Restart/Enable: +
+++++++++++++++++++++++++++++++++
+systemctl status crond.service      [crond is a daemon]
+systemctl restart crond.service
+systemctl enable crond.service
+
++++++++++++++++++++++++++++
++ How to Add/Edit Crontab +
++++++++++++++++++++++++++++
+#Crontab files are typically stored in the /etc/cron.d/ directory on Linux systems.
+
+crontab -e      [Edit the crontab file]
+crontab -l      [View the crontab entries of current users]
+crontab -e -u user      [Edit the crontab file for specefic users]          
+crontab -l -u user      [View the crontab entries of specefic users]  
+crontab -r      [remove the crontab file of current users]
+
+++++++++++++++++++++++++++++++++++++
++ Understanding Cron Jobs Schedule:+
+++++++++++++++++++++++++++++++++++++
+
+ 	*  *  *  *  *  <cmd>
+	1  2  3  4  5
+	
+	1 = Minutes (0-59)
+	2 = Hour (0-23)
+    3 = Day of month (1-31)
+    4 = Months (1-12)  
+ 	5 = Day of Week (0-6) here 0 or 7 is sunday
+    <cmd> = command to be execute 
+    
+Note: Crontab are worked at 24 Hours Time Format.     
+
+Examples for Scheduling Crontab
++++++++++++++++++++++++++++++++++++
++ Examples for Scheduling Crontab +
++++++++++++++++++++++++++++++++++++
+
+1. Schedule a cron to execute at 2 am daily.
+
+0 2 * * * /bin/sh backup.sh
+
+2. Schedule a cron to execute twice a day.
+#The below example command will execute at 5 AM and 5 PM daily. 
+
+0 5,17 * * * /scripts/script.sh     [5= 5AM, 17=5PM You can specify multiple time stamps using comma-separated.]
+
+3. Schedule a cron to execute every minute.
+
+* * * * *  /scripts/script.sh
+
+4. Schedule a cron to execute every Sunday at 5 PM.
+
+0 17 * * sun  /scripts/script.sh
+
+5. Schedule a cron to execute every 10 minutes.
+#If you want to run your script at 10 minutes intervals.
+
+*/10 * * * * /scripts/monitor.sh    [* means all values, and the /10 counts and repeats every 10th minute.]
+
+6. Schedule a cron to execute on selected months.
+#Script will run in January, May, and August months.
+
+* * * jan,may,aug *  /script/script.sh
+
+7. Schedule a cron to execute on selected days.
+#The script will run on each Sunday and Friday at 5 PM.
+
+0 17 * * sun,fri  /script/script.sh
+
+8. Schedule a cron to execute on the first Sunday of every month.
+To schedule a script to execute a script on the first Sunday only is not possible by time parameter, But we can use the condition in command fields to do it.
+
+0 2 * * sun  [ $(date +%d) -le 07 ] && /script/script.sh
+
+9. Schedule a cron to execute every four hours.
+#If you want to run a script on 4 hours intervals.
+
+0 */4 * * * /scripts/script.sh
+
+10. Schedule a cron to execute twice every Sunday and Monday.
+#The task to execute twice on Sunday and Monday at 4AM and 5PM.
+
+0 4,17 * * sun,mon /scripts/script.sh
+
+11. Schedule a cron to execute every 30 Seconds.
+#To schedule a task to execute every 30 seconds is not possible by time parameters, But it can be done by scheduling the same cron twice as below.
+
+* * * * *  sleep 30; /scripts/script.sh
+
+12. Schedule multiple tasks in a single cron.
+#To configure multiple tasks with a single cron Can be done by separating tasks by the semicolon ( ; ).
+
+* * * * * /scripts/script.sh; /scripts/scrit2.sh
+
+13. Schedule tasks to execute yearly ( @yearly ).
+@yearly timestamp is similar to “0 0 1 1 *“. It will execute a task on the first minute of every year, It may useful to send new year greetings 🙂
+
+@yearly /scripts/script.sh
+
+14. Schedule tasks to execute monthly ( @monthly ).
+@monthly timestamp is similar to “0 0 1 * *“. It will execute a task in the first minute of the month. It may useful to do monthly tasks like paying the bills and invoicing to customers.
+
+@monthly /scripts/script.sh
+
+15. Schedule tasks to execute daily ( @daily ).
+@daily timestamp is similar to “0 0 * * *“. It will execute a task in the first minute of every day, It may useful to do daily tasks.
+
+@daily /scripts/script.sh
+
+16. Schedule a job to run every six hours in a day.
+
+00 0,6,12,18  *  *  *  'curl https://example.com'
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++ Four cron directories for specefic Scheduler +
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1) /etc/cron.hourly        [Run all scripts once an hour]
+ 2) /etc/cron.daily         [Run once a day]
+ 3) /etc/cron.weekly        [Run once a week]
+ 4) /etc/cron.monthly       [Run once a month]
+
+++++++++++++++++++++++++++++++++
++ Restricted to Access CronTab +
+++++++++++++++++++++++++++++++++
+
+nano /etc/cron.deny
+
+#Write down name who can't access crontab
+
+user1
+user2
+
+++++++++++++++++++
++ Check Cron log +
+++++++++++++++++++
+
+tail /var/log/cron
+
++++++++++++++++++++++++++++++++ Complete ++++++++++++++++++++++++++++++++++
